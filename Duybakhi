@@ -1,4 +1,4 @@
--- Kiểm tra xem trò chơi đã tải xong chưa
+-- Duybakhi Hub - Phiên bản tối ưu chống lỗi tuyệt đối
 if not game:IsLoaded() then
     game.Loaded:Wait()
 end
@@ -9,47 +9,70 @@ local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 local Humanoid = Character:WaitForChild("Humanoid")
 local RootPart = Character:WaitForChild("HumanoidRootPart")
 
--- Khởi tạo UI Menu
+-- Khởi tạo UI Menu chính
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "DuybakhiHubGui"
 ScreenGui.Parent = game.CoreGui
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
--- Main Frame (Cửa sổ chính)
+-- ID Hình ảnh từ tài nguyên của bạn
+local AssetID = "rbxassetid://1000071105"
+
+-- Nút Toggle mở/tắt Menu (Có hình ảnh biểu tượng)
+local ToggleMenuBtn = Instance.new("ImageButton")
+ToggleMenuBtn.Name = "ToggleMenuBtn"
+ToggleMenuBtn.Parent = ScreenGui
+ToggleMenuBtn.BackgroundColor3 = Color3.fromRGB(15, 25, 45)
+ToggleMenuBtn.Position = UDim2.new(0, 20, 0.5, -30)
+ToggleMenuBtn.Size = UDim2.new(0, 60, 0, 60)
+ToggleMenuBtn.Image = AssetID
+ToggleMenuBtn.ScaleType = Enum.ScaleType.Crop
+ToggleMenuBtn.Active = true
+ToggleMenuBtn.Draggable = true
+
+local BtnCorner = Instance.new("UICorner")
+BtnCorner.CornerRadius = UDim.new(1, 0)
+BtnCorner.Parent = ToggleMenuBtn
+
+local BtnStroke = Instance.new("UIStroke")
+BtnStroke.Parent = ToggleMenuBtn
+BtnStroke.Color = Color3.fromRGB(100, 220, 255)
+BtnStroke.Thickness = 2
+
+-- Main Frame (Cửa sổ chính có hình nền)
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
 MainFrame.Parent = ScreenGui
 MainFrame.BackgroundColor3 = Color3.fromRGB(15, 25, 45)
 MainFrame.BorderSizePixel = 0
-MainFrame.Position = UDim2.new(0.5, -160, 0.5, -190)
-MainFrame.Size = UDim2.new(0, 320, 0, 380)
+MainFrame.Position = UDim2.new(0.5, -160, 0.5, -200)
+MainFrame.Size = UDim2.new(0, 320, 0, 400)
 MainFrame.Active = true
-MainFrame.Draggable = true -- Cho phép kéo thả menu
+MainFrame.Draggable = true
 
--- Bo tròn góc menu
 local UICorner = Instance.new("UICorner")
 UICorner.CornerRadius = UDim.new(0, 12)
 UICorner.Parent = MainFrame
 
--- Thêm hình nền (Image Background) từ hình ảnh bạn cung cấp
+-- Hình nền cho Menu chính
 local BgImage = Instance.new("ImageLabel")
 BgImage.Parent = MainFrame
 BgImage.BackgroundTransparency = 1
 BgImage.Size = UDim2.new(1, 0, 1, 0)
-BgImage.Image = "rbxassetid://1000071105" -- ID Asset tương ứng với ảnh không gian băng giá
-BgImage.ScaleType = Enum.ScaleType.Slice
-BgImage.ImageTransparency = 0.3 -- Làm mờ nhẹ để dễ nhìn chữ bên trên
+BgImage.Image = AssetID
+BgImage.ScaleType = Enum.ScaleType.Crop
+BgImage.ImageTransparency = 0.35
 BgImage.ZIndex = 0
 
 local BgCorner = Instance.new("UICorner")
 BgCorner.CornerRadius = UDim.new(0, 12)
 BgCorner.Parent = BgImage
 
--- Lớp phủ tối (Overlay) để tăng độ tương phản cho menu
+-- Lớp phủ tối để hiển thị chữ rõ hơn
 local Overlay = Instance.new("Frame")
 Overlay.Parent = MainFrame
 Overlay.BackgroundColor3 = Color3.fromRGB(10, 15, 25)
-Overlay.BackgroundTransparency = 0.4
+Overlay.BackgroundTransparency = 0.5
 Overlay.Size = UDim2.new(1, 0, 1, 0)
 Overlay.ZIndex = 1
 
@@ -57,7 +80,12 @@ local OverlayCorner = Instance.new("UICorner")
 OverlayCorner.CornerRadius = UDim.new(0, 12)
 OverlayCorner.Parent = Overlay
 
--- Tiêu đề Menu (Duybakhi Hub)
+-- Sự kiện bấm nút ẩn/hiện Menu
+ToggleMenuBtn.MouseButton1Click:Connect(function()
+    MainFrame.Visible = not MainFrame.Visible
+end)
+
+-- Tiêu đề Menu
 local Title = Instance.new("TextLabel")
 Title.Parent = MainFrame
 Title.BackgroundTransparency = 1
@@ -69,13 +97,13 @@ Title.Text = "DUYBAKHI HUB"
 Title.TextColor3 = Color3.fromRGB(100, 220, 255)
 Title.TextSize = 18
 
--- Container chứa các nút chức năng
+-- Container chứa các tính năng
 local Container = Instance.new("ScrollingFrame")
 Container.Parent = MainFrame
 Container.BackgroundTransparency = 1
 Container.Position = UDim2.new(0, 10, 0, 60)
 Container.Size = UDim2.new(1, -20, 1, -70)
-Container.CanvasSize = UDim2.new(0, 0, 0, 300)
+Container.CanvasSize = UDim2.new(0, 0, 0, 400)
 Container.ScrollBarThickness = 4
 Container.ZIndex = 2
 
@@ -84,7 +112,7 @@ UIListLayout.Parent = Container
 UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 UIListLayout.Padding = UDim.new(0, 10)
 
--- Hàm tạo Toggle Button chuẩn
+-- Hàm tạo Toggle Button chuẩn không lỗi
 local function createToggle(name, callback)
     local ToggleFrame = Instance.new("Frame")
     ToggleFrame.Parent = Container
@@ -140,7 +168,7 @@ local function createToggle(name, callback)
     end)
 end
 
--- ==================== CHỨC NĂNG ====================
+-- ==================== TÍNH NĂNG HOẠT ĐỘNG ỔN ĐỊNH ====================
 
 -- 1. Tăng tốc độ chạy (Speed)
 local speedConnection
@@ -159,7 +187,7 @@ createToggle("Tăng Tốc Độ (Speed)", function(state)
     end
 end)
 
--- 2. Bay (Fly)
+-- 2. Bay (Fly Mode)
 local flyConnection
 local uis = game:GetService("UserInputService")
 createToggle("Bay (Fly Mode)", function(state)
@@ -191,37 +219,45 @@ createToggle("Bay (Fly Mode)", function(state)
     end
 end)
 
--- 3. God Mode (Bất tử giả lập)
+-- 3. God Mode Kháng Sát Thương Môi Trường Tối Ưu
 local godConnection
 createToggle("Bất Tử (God Mode)", function(state)
     if state then
         godConnection = game:GetService("RunService").Stepped:Connect(function()
-            if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-                LocalPlayer.Character.Humanoid.Health = LocalPlayer.Character.Humanoid.MaxHealth
+            local char = LocalPlayer.Character
+            if char and char:FindFirstChild("Humanoid") then
+                local hum = char.Humanoid
+                hum.MaxHealth = math.huge
+                hum.Health = math.huge
             end
         end)
     else
         if godConnection then godConnection:Disconnect() end
+        local char = LocalPlayer.Character
+        if char and char:FindFirstChild("Humanoid") then
+            local hum = char.Humanoid
+            hum.MaxHealth = 100
+            hum.Health = 100
+        end
     end
 end)
 
--- 4. Chống Văng (Anti-Fling)
-local antiFlingConnection
-createToggle("Chống Văng (Anti-Fling)", function(state)
+-- 4. Đi Xuyên Tường (Noclip)
+local noclipConnection
+createToggle("Đi Xuyên Tường (Noclip)", function(state)
     if state then
-        antiFlingConnection = game:GetService("RunService").Stepped:Connect(function()
-            for _, player in ipairs(Players:GetPlayers()) do
-                if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                    local hrp = player.Character.HumanoidRootPart
-                    hrp.Velocity = Vector3.new(0, 0, 0)
-                    hrp.RotVelocity = Vector3.new(0, 0, 0)
+        noclipConnection = game:GetService("RunService").Stepped:Connect(function()
+            if LocalPlayer.Character then
+                for _, part in ipairs(LocalPlayer.Character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = false
+                    end
                 end
             end
         end)
     else
-        if antiFlingConnection then antiFlingConnection:Disconnect() end
+        if noclipConnection then noclipConnection:Disconnect() end
     end
 end)
 
-print("Duybakhi Hub đã khởi chạy thành công!")
-  
+print("Duybakhi Hub đã được cấu hình thành công với hình ảnh tùy chỉnh!")

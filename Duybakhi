@@ -1,0 +1,227 @@
+-- Kiểm tra xem trò chơi đã tải xong chưa
+if not game:IsLoaded() then
+    game.Loaded:Wait()
+end
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local Humanoid = Character:WaitForChild("Humanoid")
+local RootPart = Character:WaitForChild("HumanoidRootPart")
+
+-- Khởi tạo UI Menu
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "DuybakhiHubGui"
+ScreenGui.Parent = game.CoreGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- Main Frame (Cửa sổ chính)
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 25, 45)
+MainFrame.BorderSizePixel = 0
+MainFrame.Position = UDim2.new(0.5, -160, 0.5, -190)
+MainFrame.Size = UDim2.new(0, 320, 0, 380)
+MainFrame.Active = true
+MainFrame.Draggable = true -- Cho phép kéo thả menu
+
+-- Bo tròn góc menu
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 12)
+UICorner.Parent = MainFrame
+
+-- Thêm hình nền (Image Background) từ hình ảnh bạn cung cấp
+local BgImage = Instance.new("ImageLabel")
+BgImage.Parent = MainFrame
+BgImage.BackgroundTransparency = 1
+BgImage.Size = UDim2.new(1, 0, 1, 0)
+BgImage.Image = "rbxassetid://1000071105" -- ID Asset tương ứng với ảnh không gian băng giá
+BgImage.ScaleType = Enum.ScaleType.Slice
+BgImage.ImageTransparency = 0.3 -- Làm mờ nhẹ để dễ nhìn chữ bên trên
+BgImage.ZIndex = 0
+
+local BgCorner = Instance.new("UICorner")
+BgCorner.CornerRadius = UDim.new(0, 12)
+BgCorner.Parent = BgImage
+
+-- Lớp phủ tối (Overlay) để tăng độ tương phản cho menu
+local Overlay = Instance.new("Frame")
+Overlay.Parent = MainFrame
+Overlay.BackgroundColor3 = Color3.fromRGB(10, 15, 25)
+Overlay.BackgroundTransparency = 0.4
+Overlay.Size = UDim2.new(1, 0, 1, 0)
+Overlay.ZIndex = 1
+
+local OverlayCorner = Instance.new("UICorner")
+OverlayCorner.CornerRadius = UDim.new(0, 12)
+OverlayCorner.Parent = Overlay
+
+-- Tiêu đề Menu (Duybakhi Hub)
+local Title = Instance.new("TextLabel")
+Title.Parent = MainFrame
+Title.BackgroundTransparency = 1
+Title.Position = UDim2.new(0, 0, 0, 10)
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.ZIndex = 2
+Title.Font = Enum.Font.GothamBold
+Title.Text = "DUYBAKHI HUB"
+Title.TextColor3 = Color3.fromRGB(100, 220, 255)
+Title.TextSize = 18
+
+-- Container chứa các nút chức năng
+local Container = Instance.new("ScrollingFrame")
+Container.Parent = MainFrame
+Container.BackgroundTransparency = 1
+Container.Position = UDim2.new(0, 10, 0, 60)
+Container.Size = UDim2.new(1, -20, 1, -70)
+Container.CanvasSize = UDim2.new(0, 0, 0, 300)
+Container.ScrollBarThickness = 4
+Container.ZIndex = 2
+
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.Parent = Container
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Padding = UDim.new(0, 10)
+
+-- Hàm tạo Toggle Button chuẩn
+local function createToggle(name, callback)
+    local ToggleFrame = Instance.new("Frame")
+    ToggleFrame.Parent = Container
+    ToggleFrame.BackgroundColor3 = Color3.fromRGB(20, 35, 60)
+    ToggleFrame.BackgroundTransparency = 0.3
+    ToggleFrame.Size = UDim2.new(1, 0, 0, 45)
+    ToggleFrame.ZIndex = 2
+    
+    local Corner = Instance.new("UICorner")
+    Corner.CornerRadius = UDim.new(0, 8)
+    Corner.Parent = ToggleFrame
+    
+    local Label = Instance.new("TextLabel")
+    Label.Parent = ToggleFrame
+    Label.BackgroundTransparency = 1
+    Label.Position = UDim2.new(0, 12, 0, 0)
+    Label.Size = UDim2.new(0, 180, 1, 0)
+    Label.ZIndex = 2
+    Label.Font = Enum.Font.GothamMedium
+    Label.Text = name
+    Label.TextColor3 = Color3.fromRGB(230, 240, 255)
+    Label.TextSize = 14
+    Label.TextXAlignment = Enum.TextXAlignment.Left
+    
+    local Button = Instance.new("TextButton")
+    Button.Parent = ToggleFrame
+    Button.BackgroundColor3 = Color3.fromRGB(40, 60, 90)
+    Button.Position = UDim2.new(1, -55, 0.5, -12)
+    Button.Size = UDim2.new(0, 45, 0, 24)
+    Button.ZIndex = 2
+    Button.Font = Enum.Font.GothamBold
+    Button.Text = "OFF"
+    Button.TextColor3 = Color3.fromRGB(255, 100, 100)
+    Button.TextSize = 12
+    
+    local BtnCorner = Instance.new("UICorner")
+    BtnCorner.CornerRadius = UDim.new(0, 12)
+    BtnCorner.Parent = Button
+    
+    local toggled = false
+    Button.MouseButton1Click:Connect(function()
+        toggled = not toggled
+        if toggled then
+            Button.Text = "ON"
+            Button.TextColor3 = Color3.fromRGB(100, 255, 100)
+            Button.BackgroundColor3 = Color3.fromRGB(40, 140, 90)
+        else
+            Button.Text = "OFF"
+            Button.TextColor3 = Color3.fromRGB(255, 100, 100)
+            Button.BackgroundColor3 = Color3.fromRGB(40, 60, 90)
+        end
+        callback(toggled)
+    end)
+end
+
+-- ==================== CHỨC NĂNG ====================
+
+-- 1. Tăng tốc độ chạy (Speed)
+local speedConnection
+createToggle("Tăng Tốc Độ (Speed)", function(state)
+    if state then
+        speedConnection = game:GetService("RunService").RenderStepped:Connect(function()
+            if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+                LocalPlayer.Character.Humanoid.WalkSpeed = 50
+            end
+        end)
+    else
+        if speedConnection then speedConnection:Disconnect() end
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+            LocalPlayer.Character.Humanoid.WalkSpeed = 16
+        end
+    end
+end)
+
+-- 2. Bay (Fly)
+local flyConnection
+local uis = game:GetService("UserInputService")
+createToggle("Bay (Fly Mode)", function(state)
+    if state then
+        local bg = Instance.new("BodyGyro", RootPart)
+        bg.P = 9e4
+        bg.maxTorque = Vector3.new(9e4, 9e4, 9e4)
+        bg.cframe = RootPart.CFrame
+        
+        local bv = Instance.new("BodyVelocity", RootPart)
+        bv.velocity = Vector3.new(0, 0.1, 0)
+        bv.maxForce = Vector3.new(9e4, 9e4, 9e4)
+        
+        flyConnection = game:GetService("RunService").RenderStepped:Connect(function()
+            local cam = workspace.CurrentCamera
+            local dir = Vector3.new()
+            if uis:IsKeyDown(Enum.KeyCode.W) then dir = dir + cam.CoordinateFrame.LookVector end
+            if uis:IsKeyDown(Enum.KeyCode.S) then dir = dir - cam.CoordinateFrame.LookVector end
+            if uis:IsKeyDown(Enum.KeyCode.A) then dir = dir - cam.CoordinateFrame.RightVector end
+            if uis:IsKeyDown(Enum.KeyCode.D) then dir = dir + cam.CoordinateFrame.RightVector end
+            
+            bv.velocity = dir * 50
+            bg.cframe = cam.CoordinateFrame
+        end)
+    else
+        if flyConnection then flyConnection:Disconnect() end
+        if RootPart:FindFirstChild("BodyGyro") then RootPart.BodyGyro:Destroy() end
+        if RootPart:FindFirstChild("BodyVelocity") then RootPart.BodyVelocity:Destroy() end
+    end
+end)
+
+-- 3. God Mode (Bất tử giả lập)
+local godConnection
+createToggle("Bất Tử (God Mode)", function(state)
+    if state then
+        godConnection = game:GetService("RunService").Stepped:Connect(function()
+            if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+                LocalPlayer.Character.Humanoid.Health = LocalPlayer.Character.Humanoid.MaxHealth
+            end
+        end)
+    else
+        if godConnection then godConnection:Disconnect() end
+    end
+end)
+
+-- 4. Chống Văng (Anti-Fling)
+local antiFlingConnection
+createToggle("Chống Văng (Anti-Fling)", function(state)
+    if state then
+        antiFlingConnection = game:GetService("RunService").Stepped:Connect(function()
+            for _, player in ipairs(Players:GetPlayers()) do
+                if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                    local hrp = player.Character.HumanoidRootPart
+                    hrp.Velocity = Vector3.new(0, 0, 0)
+                    hrp.RotVelocity = Vector3.new(0, 0, 0)
+                end
+            end
+        end)
+    else
+        if antiFlingConnection then antiFlingConnection:Disconnect() end
+    end
+end)
+
+print("Duybakhi Hub đã khởi chạy thành công!")
+  
